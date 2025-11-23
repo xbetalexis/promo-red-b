@@ -130,7 +130,7 @@
       50% { filter: drop-shadow(0 0 16px #ff9800); }
       100% { filter: drop-shadow(0 0 0px #ff9800); }
     }
-    .bonus-win { animation: bonusGlow 0.9s ease; }
+    .bonus-win { animation: bonusGlow 0.9s.ease; }
 
     @keyframes diamondGlow {
       0% { filter: drop-shadow(0 0 0px #80deea); }
@@ -263,27 +263,27 @@
 
     <div class="paytable">
       🃏 3 JOKER alineados → <strong>SIN PREMIO</strong> (solo mito de JACKPOT 😈)<br><br>
-      ⭐ ESTRELLAS alineadas (línea o diagonal):<br>
-      • 5 ⭐ → <strong>2K fichas</strong> (combo legendario)<br>
+      ⭐ ESTRELLAS (desde la 1° columna hacia la derecha):<br>
+      • 5 ⭐ → <strong>2K fichas</strong><br>
       • 4 ⭐ → <strong>1K fichas</strong><br>
       • 3 ⭐ → <strong>500 fichas</strong><br><br>
-      💎 DIAMANTES alineados:<br>
+      💎 DIAMANTES:<br>
       • 5 💎 → <strong>5K fichas</strong><br>
       • 4 💎 → <strong>2.500 fichas</strong><br>
       • 3 💎 → <strong>1K fichas</strong><br><br>
-      👑 CORONAS alineadas:<br>
+      👑 CORONAS:<br>
       • 5 👑 → <strong>500 fichas</strong><br>
       • 4 👑 → <strong>300 fichas</strong><br>
       • 3 👑 → <strong>100 fichas</strong><br><br>
-      🔔 CAMPANAS alineadas:<br>
+      🔔 CAMPANAS:<br>
       • 5 🔔 → <strong>5K fichas</strong><br>
       • 4 🔔 → <strong>3K fichas</strong><br>
       • 3 🔔 → <strong>1K fichas</strong><br><br>
-      💠 GEMAS alineadas:<br>
+      💠 GEMAS:<br>
       • 5 💠 → <strong>6K fichas</strong><br>
       • 4 💠 → <strong>4K fichas</strong><br>
       • 3 💠 → <strong>2K fichas</strong><br><br>
-      Los premios son en fichas RED-B. Válidos en líneas horizontales o diagonales.
+      Válido en las líneas que empiezan en la 1° columna (arriba, centro, abajo y diagonales en V).
     </div>
 
     <small class="nota">
@@ -294,7 +294,7 @@
 
   <script>
     const MAX_INTENTOS_DIA = 3;
-    const STORAGE_KEY = "redb_jackpot_state_v6";
+    const STORAGE_KEY = "redb_jackpot_state_v7";
 
     const SYMBOLS = ["🃏", "⭐", "💎", "👑", "🔔", "💠"];
 
@@ -423,7 +423,7 @@
       next();
     }
 
-    // Evita 3+ jokers en cualquier línea y 5 iguales de cualquier símbolo en filas
+    // Evita 5 iguales en fila y 3+ jokers en fila/diagonal
     function evitarCombinacionesProhibidas() {
       // 1) Evitar 5 iguales horizontales de cualquier símbolo
       for (let row = 0; row < 3; row++) {
@@ -437,7 +437,6 @@
         const symbol0 = filaCells[0].textContent;
         const todosIguales = filaCells.every(c => c.textContent === symbol0);
         if (todosIguales) {
-          // Romper el medio
           const middleCell = filaCells[2];
           const excludeJoker = (parseInt(middleCell.dataset.row, 10) === 1);
           middleCell.textContent = simboloRandomDistinto(symbol0, excludeJoker);
@@ -481,8 +480,7 @@
         }
       }
 
-      // 3) Evitar diagonales de 3 jokers (↘ y ↗)
-      // ↘ diagonales posibles
+      // 3) Evitar diagonales de 3 jokers ↘
       const diagDownStarts = [
         { r: 0, c: 0 },
         { r: 0, c: 1 },
@@ -511,7 +509,7 @@
         }
       });
 
-      // ↗ diagonales posibles
+      // 4) Evitar diagonales de 3 jokers ↗
       const diagUpStarts = [
         { r: 2, c: 0 },
         { r: 2, c: 1 },
@@ -541,7 +539,7 @@
       });
     }
 
-    function generarCodigo(tipoPremio, cantidad, simbolo) {
+    function generarCodigo(simbolo, cantidad) {
       const ahora = new Date();
       const y = ahora.getFullYear();
       const m = String(ahora.getMonth()+1).padStart(2,"0");
@@ -557,8 +555,7 @@
         rand += chars[Math.floor(Math.random() * chars.length)];
       }
 
-      // tipoPremio: símbolo, ej "⭐"
-      return `REDBJACK-${tipoPremio}${cantidad}-${base}-${rand}`;
+      return `REDBJACK-${simbolo}${cantidad}-${base}-${rand}`;
     }
 
     function formatearFechaHora() {
@@ -587,15 +584,30 @@
       return grid;
     }
 
-    // Busca el mejor premio entre todas las líneas (horizontales + diagonales)
+    // 👉 AHORA SOLO PAGA LÍNEAS QUE EMPIEZAN EN LA 1° COLUMNA
     function evaluarGanadores() {
       const grid = obtenerGrid();
       let mejorPremio = null; // { simbolo, cantidad, fichas }
       let mejoresCeldas = [];
 
-      function evaluarRun(simbolo, runCells) {
-        const len = runCells.length;
-        if (PRIZES[simbolo] && PRIZES[simbolo][len]) {
+      function evaluarLinea(positions) {
+        if (positions.length === 0) return;
+        const first = positions[0];
+        const simbolo = grid[first.r][first.c].simbolo;
+        const runCells = [grid[first.r][first.c].cell];
+        let len = 1;
+
+        for (let i = 1; i < positions.length; i++) {
+          const { r, c } = positions[i];
+          if (grid[r][c].simbolo === simbolo) {
+            runCells.push(grid[r][c].cell);
+            len++;
+          } else {
+            break; // solo cuenta desde la 1° columna hacia la derecha
+          }
+        }
+
+        if (len >= 3 && PRIZES[simbolo] && PRIZES[simbolo][len]) {
           const fichas = PRIZES[simbolo][len];
           if (!mejorPremio || fichas > mejorPremio.fichas) {
             mejorPremio = { simbolo, cantidad: len, fichas };
@@ -604,82 +616,17 @@
         }
       }
 
-      // horizontales
-      for (let row = 0; row < 3; row++) {
-        let currentSymbol = grid[row][0].simbolo;
-        let runCells = [grid[row][0].cell];
-
-        for (let col = 1; col < 5; col++) {
-          if (grid[row][col].simbolo === currentSymbol) {
-            runCells.push(grid[row][col].cell);
-          } else {
-            if (runCells.length >= 3) evaluarRun(currentSymbol, runCells);
-            currentSymbol = grid[row][col].simbolo;
-            runCells = [grid[row][col].cell];
-          }
-        }
-        if (runCells.length >= 3) evaluarRun(currentSymbol, runCells);
-      }
-
-      // diagonales ↘
-      const diagDownStarts = [
-        { r: 0, c: 0 },
-        { r: 0, c: 1 },
-        { r: 0, c: 2 }
+      const lineas = [
+        // horizontales desde col 0
+        [ { r:0,c:0 }, { r:0,c:1 }, { r:0,c:2 }, { r:0,c:3 }, { r:0,c:4 } ],
+        [ { r:1,c:0 }, { r:1,c:1 }, { r:1,c:2 }, { r:1,c:3 }, { r:1,c:4 } ],
+        [ { r:2,c:0 }, { r:2,c:1 }, { r:2,c:2 }, { r:2,c:3 }, { r:2,c:4 } ],
+        // diagonales en V empezando en la 1° columna
+        [ { r:0,c:0 }, { r:1,c:1 }, { r:2,c:2 } ], // ↘
+        [ { r:2,c:0 }, { r:1,c:1 }, { r:0,c:2 } ]  // ↗
       ];
-      diagDownStarts.forEach(start => {
-        let r = start.r;
-        let c = start.c;
-        let line = [];
-        while (r < 3 && c < 5) {
-          line.push({ simbolo: grid[r][c].simbolo, cell: grid[r][c].cell });
-          r++; c++;
-        }
-        if (line.length >= 3) {
-          let currentSymbol = line[0].simbolo;
-          let runCells = [line[0].cell];
-          for (let i = 1; i < line.length; i++) {
-            if (line[i].simbolo === currentSymbol) {
-              runCells.push(line[i].cell);
-            } else {
-              if (runCells.length >= 3) evaluarRun(currentSymbol, runCells);
-              currentSymbol = line[i].simbolo;
-              runCells = [line[i].cell];
-            }
-          }
-          if (runCells.length >= 3) evaluarRun(currentSymbol, runCells);
-        }
-      });
 
-      // diagonales ↗
-      const diagUpStarts = [
-        { r: 2, c: 0 },
-        { r: 2, c: 1 },
-        { r: 2, c: 2 }
-      ];
-      diagUpStarts.forEach(start => {
-        let r = start.r;
-        let c = start.c;
-        let line = [];
-        while (r >= 0 && c < 5) {
-          line.push({ simbolo: grid[r][c].simbolo, cell: grid[r][c].cell });
-          r--; c++;
-        }
-        if (line.length >= 3) {
-          let currentSymbol = line[0].simbolo;
-          let runCells = [line[0].cell];
-          for (let i = 1; i < line.length; i++) {
-            if (line[i].simbolo === currentSymbol) {
-              runCells.push(line[i].cell);
-            } else {
-              if (runCells.length >= 3) evaluarRun(currentSymbol, runCells);
-              currentSymbol = line[i].simbolo;
-              runCells = [line[i].cell];
-            }
-          }
-          if (runCells.length >= 3) evaluarRun(currentSymbol, runCells);
-        }
-      });
+      lineas.forEach(evaluarLinea);
 
       if (mejorPremio) {
         return { premio: mejorPremio, celdas: mejoresCeldas };
@@ -707,13 +654,13 @@
       setTimeout(() => slotWrapper.classList.remove("shake"), 600);
 
       const { fecha, hora } = formatearFechaHora();
-      const codigo = generarCodigo(premioInfo.simbolo, premioInfo.cantidad, premioInfo.simbolo);
+      const codigo = generarCodigo(premioInfo.simbolo, premioInfo.cantidad);
 
       mensajeInfo(`
         🎉 ¡GANASTE <strong>${premioInfo.fichas} FICHAS</strong>! 🎉<br>
         <small>
         Premio en fichas RED-B JACKPOT.<br>
-        Combinación: ${premioInfo.cantidad} símbolos ${premioInfo.simbolo}<br>
+        Combinación: ${premioInfo.cantidad} símbolos ${premioInfo.simbolo} desde la 1° columna<br>
         Fecha: ${fecha} - ${hora}<br>
         Código: ${codigo}<br><br>
         ✅ YA TE SALIÓ PREMIO<br>
