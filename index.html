@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>RED-B Slot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #ff0040 0, #0b0014 55%, #000 100%);
+      color: #fff;
+      font-family: "Montserrat", system-ui, sans-serif;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 420px;
+      background: rgba(6, 0, 20, 0.9);
+      border-radius: 24px;
+      padding: 20px 20px 26px;
+      box-shadow: 0 0 25px rgba(255, 0, 90, 0.8), 0 0 80px rgba(0, 255, 255, 0.3);
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    h1 {
+      font-family: "Orbitron", system-ui;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: #ff1744;
+      text-shadow: 0 0 12px rgba(255, 23, 68, 0.85);
+    }
+
+    .sub { font-size: 0.9rem; color: #e0e0e0; margin-bottom: 14px; }
+    .sub strong { color: #ffd54f; }
+
+    .slot-machine { margin: 12px 0 18px; display: flex; justify-content: center; }
+
+    .slot-window {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      padding: 10px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #1b0026, #42002b);
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      min-width: 240px;
+    }
+
+    .reel {
+      background: radial-gradient(circle at top, #ffffff 0, #e0e0e0 40%, #b0bec5 100%);
+      border-radius: 14px;
+      padding: 10px 0;
+      font-size: 2.1rem;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+    }
+
+    #spinBtn {
+      margin-top: 4px;
+      width: 100%;
+      padding: 12px;
+      border-radius: 999px;
+      border: none;
+      font-family: "Orbitron", system-ui;
+      font-size: 1rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ff1744, #ff9100);
+      color: #fff;
+      box-shadow: 0 0 18px rgba(255, 23, 68, 0.9);
+    }
+
+    #mensaje {
+      margin-top: 14px;
+      min-height: 38px;
+      font-size: 0.95rem;
+    }
+
+    #mensaje.ok {
+      color: #76ff03;
+      text-shadow: 0 0 10px rgba(118, 255, 3, 0.7);
+      font-weight: 700;
+    }
+
+    #mensaje.error {
+      color: #ff8a80;
+      font-weight: 600;
+    }
+
+    .nota {
+      display: block;
+      margin-top: 14px;
+      font-size: 0.75rem;
+      color: #aaaaaa;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>RED-B Slot</h1>
+    <p class="sub">
+      Tocá el botón y fijate si te llevás <strong>500 fichas</strong> 🎰
+    </p>
+
+    <div class="slot-machine">
+      <div class="slot-window">
+        <div class="reel" id="reel1">🍒</div>
+        <div class="reel" id="reel2">🍋</div>
+        <div class="reel" id="reel3">⭐</div>
+      </div>
+    </div>
+
+    <button id="spinBtn">TIRAR SLOT RED-B</button>
+
+    <p id="premiosRestantes">Premios de 500 fichas restantes hoy: 10</p>
+
+    <div id="mensaje"></div>
+
+    <small class="nota">
+      Un intento por día por dispositivo. Si ganás, sacá captura y enviála a la línea.  
+      Promoción RED-B exclusiva para estados.
+    </small>
+  </div>
+
+  <script>
+    const MAX_PREMIOS_DIA = 10;
+    const PROB_GANAR = 0.30;
+    const STORAGE_KEY = "redb_slot_state";
+    const simbolos = ["🍒","🍋","⭐","7️⃣","💎","🔔","🍀"];
+
+    const reel1 = document.getElementById("reel1");
+    const reel2 = document.getElementById("reel2");
+    const reel3 = document.getElementById("reel3");
+    const spinBtn = document.getElementById("spinBtn");
+    const mensaje = document.getElementById("mensaje");
+    const premiosRestantesEl = document.getElementById("premiosRestantes");
+
+    function hoyString() {
+      const h = new Date();
+      return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,"0")}-${String(h.getDate()).padStart(2,"0")}`;
+    }
+
+    function cargarEstado() {
+      try {
+        const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        const hoy = hoyString();
+        if (!data || data.fecha !== hoy) {
+          return { fecha: hoy, premiosOtorgados: 0, yaJugoHoy: false };
+        }
+        return data;
+      } catch {
+        return { fecha: hoyString(), premiosOtorgados: 0, yaJugoHoy: false };
+      }
+    }
+
+    function guardarEstado(estado) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
+    }
+
+    function actualizarUI(estado) {
+      const restantes = Math.max(0, MAX_PREMIOS_DIA - estado.premiosOtorgados);
+      premiosRestantesEl.textContent = `Premios de 500 fichas restantes hoy: ${restantes}`;
+    }
+
+    function mensajeInfo(texto, tipo=null) {
+      mensaje.textContent = texto;
+      mensaje.classList.remove("ok","error");
+      if (tipo==="ok") mensaje.classList.add("ok");
+      if (tipo==="error") mensaje.classList.add("error");
+    }
+
+    function simboloRandom() {
+      return simbolos[Math.floor(Math.random() * simbolos.length)];
+    }
+
+    function animarSlot(callbackFin) {
+      const dur = 900;
+      const start = performance.now();
+      function frame(now) {
+        if (now - start < dur) {
+          reel1.textContent = simboloRandom();
+          reel2.textContent = simboloRandom();
+          reel3.textContent = simboloRandom();
+          requestAnimationFrame(frame);
+        } else {
+          const f1 = simboloRandom();
+          const f2 = simboloRandom();
+          const f3 = simboloRandom();
+          reel1.textContent = f1;
+          reel2.textContent = f2;
+          reel3.textContent = f3;
+          callbackFin();
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function jugar() {
+      let estado = cargarEstado();
+      const restantes = Math.max(0, MAX_PREMIOS_DIA - estado.premiosOtorgados);
+
+      if (estado.yaJugoHoy) {
+        mensajeInfo("Ya jugaste hoy. Volvé mañana 🔁", "error");
+        return;
+      }
+
+      spinBtn.disabled = true;
+      mensajeInfo("Girando... 🎰");
+
+      animarSlot(() => {
+        estado.yaJugoHoy = true;
+        let gano = false;
+
+        if (restantes > 0 && Math.random() < PROB_GANAR) {
+          gano = true;
+          estado.premiosOtorgados += 1;
+        }
+
+        guardarEstado(estado);
+        actualizarUI(estado);
+
+        if (gano) {
+          mensajeInfo("🎉 ¡GANASTE 500 FICHAS! SI TENÉS PREMIO, SACÁ CAPTURA Y ENVIÁLA A LA LÍNEA 📲", "ok");
+        } else {
+          mensajeInfo("Hoy no tocó premio 🙈 Volvé mañana.", "error");
+        }
+
+        spinBtn.disabled = false;
+      });
+    }
+
+    actualizarUI(cargarEstado());
+    mensajeInfo("Tenés 1 intento hoy. ¡Suerte! 🍀");
+
+    spinBtn.addEventListener("click", jugar);
+  </script>
+</body>
+</html>
