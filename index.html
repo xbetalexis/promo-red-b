@@ -118,27 +118,6 @@
     }
     .shake { animation: shake 0.5s ease; }
 
-    @keyframes jokerPulse {
-      0% { transform: scale(1); filter: drop-shadow(0 0 0px #ffeb3b); }
-      50% { transform: scale(1.2); filter: drop-shadow(0 0 16px #ffeb3b); }
-      100% { transform: scale(1); filter: drop-shadow(0 0 0px #ffeb3b); }
-    }
-    .joker-win { animation: jokerPulse 0.8s ease; }
-
-    @keyframes bonusGlow {
-      0% { filter: drop-shadow(0 0 0px #ff9800); }
-      50% { filter: drop-shadow(0 0 16px #ff9800); }
-      100% { filter: drop-shadow(0 0 0px #ff9800); }
-    }
-    .bonus-win { animation: bonusGlow 0.9s.ease; }
-
-    @keyframes diamondGlow {
-      0% { filter: drop-shadow(0 0 0px #80deea); }
-      50% { filter: drop-shadow(0 0 16px #80deea); }
-      100% { filter: drop-shadow(0 0 0px #80deea); }
-    }
-    .diamond-win { animation: diamondGlow 1s ease; }
-
     #spinBtn {
       margin-top: 4px;
       width: 100%;
@@ -156,25 +135,12 @@
         0 6px 0 rgba(123, 31, 162, 1),
         0 0 20px rgba(255, 235, 59, 0.9);
       transform: translateY(0);
-      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.1s ease;
-    }
-
-    #spinBtn:hover:not(:disabled) { filter: brightness(1.05); }
-
-    #spinBtn:active:not(:disabled) {
-      transform: translateY(3px);
-      box-shadow:
-        0 3px 0 rgba(123, 31, 162, 1),
-        0 0 14px rgba(255, 235, 59, 0.7);
     }
 
     #spinBtn:disabled {
       opacity: 0.55;
       cursor: not-allowed;
       transform: translateY(3px);
-      box-shadow:
-        0 3px 0 rgba(80, 80, 80, 0.5),
-        0 0 8px rgba(120, 120, 120, 0.4);
     }
 
     #mensaje {
@@ -262,28 +228,37 @@
     <div id="mensaje"></div>
 
     <div class="paytable">
-      🃏 3 JOKER alineados → <strong>SIN PREMIO</strong> (solo mito de JACKPOT 😈)<br><br>
-      ⭐ ESTRELLAS (desde la 1° columna hacia la derecha):<br>
+      🃏 <strong>JOKER JACKPOT</strong><br>
+      • 5 🃏 → <strong>50K en fichas</strong><br>
+      • 4 🃏 → <strong>15K en fichas</strong><br>
+      • 3 🃏 → <strong>10K en fichas</strong><br><br>
+
+      ⭐ ESTRELLAS:<br>
       • 5 ⭐ → <strong>2K fichas</strong><br>
       • 4 ⭐ → <strong>1K fichas</strong><br>
       • 3 ⭐ → <strong>500 fichas</strong><br><br>
+
       💎 DIAMANTES:<br>
       • 5 💎 → <strong>5K fichas</strong><br>
       • 4 💎 → <strong>2.500 fichas</strong><br>
       • 3 💎 → <strong>1K fichas</strong><br><br>
+
       👑 CORONAS:<br>
       • 5 👑 → <strong>500 fichas</strong><br>
       • 4 👑 → <strong>300 fichas</strong><br>
       • 3 👑 → <strong>100 fichas</strong><br><br>
+
       🔔 CAMPANAS:<br>
       • 5 🔔 → <strong>5K fichas</strong><br>
       • 4 🔔 → <strong>3K fichas</strong><br>
       • 3 🔔 → <strong>1K fichas</strong><br><br>
+
       💠 GEMAS:<br>
       • 5 💠 → <strong>6K fichas</strong><br>
       • 4 💠 → <strong>4K fichas</strong><br>
       • 3 💠 → <strong>2K fichas</strong><br><br>
-      Válido en las líneas que empiezan en la 1° columna (arriba, centro, abajo y diagonales en V).
+
+      Premios válidos solo si la combinación empieza en la 1° columna.
     </div>
 
     <small class="nota">
@@ -294,18 +269,17 @@
 
   <script>
     const MAX_INTENTOS_DIA = 3;
-    const STORAGE_KEY = "redb_jackpot_state_v7";
+    const STORAGE_KEY = "redb_jackpot_state_v8";
 
     const SYMBOLS = ["🃏", "⭐", "💎", "👑", "🔔", "💠"];
 
-    // Premios por símbolo y cantidad de alineados
     const PRIZES = {
       "⭐": { 3: 500, 4: 1000, 5: 2000 },
       "💎": { 3: 1000, 4: 2500, 5: 5000 },
       "👑": { 3: 100, 4: 300, 5: 500 },
       "🔔": { 3: 1000, 4: 3000, 5: 5000 },
       "💠": { 3: 2000, 4: 4000, 5: 6000 }
-      // 🃏 no tiene premio
+      // 🃏 nunca paga
     };
 
     const slotMachine = document.getElementById("slotMachine");
@@ -423,9 +397,8 @@
       next();
     }
 
-    // Evita 5 iguales en fila y 3+ jokers en fila/diagonal
     function evitarCombinacionesProhibidas() {
-      // 1) Evitar 5 iguales horizontales de cualquier símbolo
+      // Evitar 5 iguales horizontales
       for (let row = 0; row < 3; row++) {
         const filaCells = [];
         for (let col = 0; col < 5; col++) {
@@ -443,7 +416,7 @@
         }
       }
 
-      // 2) Evitar 3+ jokers horizontales
+      // Evitar 3+ jokers horizontales
       for (let row = 0; row < 3; row++) {
         let runStart = -1;
         let runLength = 0;
@@ -479,64 +452,6 @@
           }
         }
       }
-
-      // 3) Evitar diagonales de 3 jokers ↘
-      const diagDownStarts = [
-        { r: 0, c: 0 },
-        { r: 0, c: 1 },
-        { r: 0, c: 2 }
-      ];
-      diagDownStarts.forEach(start => {
-        const cellsDiag = [];
-        let r = start.r;
-        let c = start.c;
-        while (r < 3 && c < 5) {
-          const cell = cells.find(
-            x => parseInt(x.dataset.row, 10) === r && parseInt(x.dataset.col, 10) === c
-          );
-          cellsDiag.push(cell);
-          r++; c++;
-        }
-        if (cellsDiag.length >= 3) {
-          for (let i = 0; i <= cellsDiag.length - 3; i++) {
-            const trio = cellsDiag.slice(i, i+3);
-            if (trio.every(cell => cell.textContent === "🃏")) {
-              const middleCell = trio[1];
-              const excludeJoker = (parseInt(middleCell.dataset.row, 10) === 1);
-              middleCell.textContent = simboloRandomDistinto("🃏", excludeJoker);
-            }
-          }
-        }
-      });
-
-      // 4) Evitar diagonales de 3 jokers ↗
-      const diagUpStarts = [
-        { r: 2, c: 0 },
-        { r: 2, c: 1 },
-        { r: 2, c: 2 }
-      ];
-      diagUpStarts.forEach(start => {
-        const cellsDiag = [];
-        let r = start.r;
-        let c = start.c;
-        while (r >= 0 && c < 5) {
-          const cell = cells.find(
-            x => parseInt(x.dataset.row, 10) === r && parseInt(x.dataset.col, 10) === c
-          );
-          cellsDiag.push(cell);
-          r--; c++;
-        }
-        if (cellsDiag.length >= 3) {
-          for (let i = 0; i <= cellsDiag.length - 3; i++) {
-            const trio = cellsDiag.slice(i, i+3);
-            if (trio.every(cell => cell.textContent === "🃏")) {
-              const middleCell = trio[1];
-              const excludeJoker = (parseInt(middleCell.dataset.row, 10) === 1);
-              middleCell.textContent = simboloRandomDistinto("🃏", excludeJoker);
-            }
-          }
-        }
-      });
     }
 
     function generarCodigo(simbolo, cantidad) {
@@ -584,10 +499,10 @@
       return grid;
     }
 
-    // 👉 AHORA SOLO PAGA LÍNEAS QUE EMPIEZAN EN LA 1° COLUMNA
+    // ✅ SOLO paga combinaciones que empiezan en la 1° columna (columna 0)
     function evaluarGanadores() {
       const grid = obtenerGrid();
-      let mejorPremio = null; // { simbolo, cantidad, fichas }
+      let mejorPremio = null;
       let mejoresCeldas = [];
 
       function evaluarLinea(positions) {
@@ -603,7 +518,7 @@
             runCells.push(grid[r][c].cell);
             len++;
           } else {
-            break; // solo cuenta desde la 1° columna hacia la derecha
+            break;
           }
         }
 
@@ -617,13 +532,11 @@
       }
 
       const lineas = [
-        // horizontales desde col 0
         [ { r:0,c:0 }, { r:0,c:1 }, { r:0,c:2 }, { r:0,c:3 }, { r:0,c:4 } ],
         [ { r:1,c:0 }, { r:1,c:1 }, { r:1,c:2 }, { r:1,c:3 }, { r:1,c:4 } ],
         [ { r:2,c:0 }, { r:2,c:1 }, { r:2,c:2 }, { r:2,c:3 }, { r:2,c:4 } ],
-        // diagonales en V empezando en la 1° columna
-        [ { r:0,c:0 }, { r:1,c:1 }, { r:2,c:2 } ], // ↘
-        [ { r:2,c:0 }, { r:1,c:1 }, { r:0,c:2 } ]  // ↗
+        [ { r:0,c:0 }, { r:1,c:1 }, { r:2,c:2 } ],
+        [ { r:2,c:0 }, { r:1,c:1 }, { r:0,c:2 } ]
       ];
 
       lineas.forEach(evaluarLinea);
@@ -636,19 +549,13 @@
 
     function limpiarResaltados() {
       cells.forEach(cell => {
-        cell.classList.remove("win-highlight", "joker-win", "bonus-win", "diamond-win");
+        cell.classList.remove("win-highlight");
       });
     }
 
     function mostrarPremio(premioInfo, celdas) {
       limpiarResaltados();
       celdas.forEach(cell => cell.classList.add("win-highlight"));
-
-      if (premioInfo.simbolo === "⭐") {
-        celdas.forEach(c => c.classList.add("bonus-win"));
-      } else if (premioInfo.simbolo === "💎") {
-        celdas.forEach(c => c.classList.add("diamond-win"));
-      }
 
       slotWrapper.classList.add("shake");
       setTimeout(() => slotWrapper.classList.remove("shake"), 600);
