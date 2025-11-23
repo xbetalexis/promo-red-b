@@ -57,7 +57,7 @@
       transition: transform 0.2s ease;
     }
 
-    /* ✅ SHAKE */
+    /* SHAKE */
     @keyframes shake {
       0% { transform: translateX(0); }
       20% { transform: translateX(-6px); }
@@ -83,7 +83,7 @@
       transition: transform 0.2s ease;
     }
 
-    /* ✅ EFECTO PAYASO (PREMIO 500 FICHAS) */
+    /* EFECTO PAYASO (500 fichas) */
     @keyframes payasoPulse {
       0% { transform: scale(1); filter: drop-shadow(0 0 0px #ffea00); }
       50% { transform: scale(1.2); filter: drop-shadow(0 0 16px #ffea00); }
@@ -93,7 +93,7 @@
       animation: payasoPulse 0.8s ease;
     }
 
-    /* ✅ EFECTO DIAMANTE (PREMIO 200 FICHAS) */
+    /* EFECTO DIAMANTE (200 fichas) */
     @keyframes diamondGlow {
       0% { filter: drop-shadow(0 0 0px #00e5ff); }
       50% { filter: drop-shadow(0 0 14px #00e5ff); }
@@ -103,6 +103,7 @@
       animation: diamondGlow 1s ease;
     }
 
+    /* 🔘 BOTÓN EFECTO 3D */
     #spinBtn {
       margin-top: 4px;
       width: 100%;
@@ -112,9 +113,33 @@
       font-family: "Orbitron", system-ui;
       font-size: 1rem;
       cursor: pointer;
-      background: linear-gradient(135deg, #ff1744, #ff9100);
+      background: linear-gradient(135deg, #ff9100, #ff1744);
       color: #fff;
-      box-shadow: 0 0 18px rgba(255, 23, 68, 0.9);
+      box-shadow:
+        0 6px 0 rgba(120, 0, 30, 1),
+        0 0 18px rgba(255, 23, 68, 0.9);
+      transform: translateY(0);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.1s ease;
+    }
+
+    #spinBtn:hover {
+      filter: brightness(1.05);
+    }
+
+    #spinBtn:active {
+      transform: translateY(3px);
+      box-shadow:
+        0 2px 0 rgba(120, 0, 30, 1),
+        0 0 10px rgba(255, 23, 68, 0.7);
+    }
+
+    #spinBtn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: translateY(3px);
+      box-shadow:
+        0 2px 0 rgba(80, 80, 80, 0.5),
+        0 0 6px rgba(120, 120, 120, 0.4);
     }
 
     #mensaje {
@@ -320,7 +345,6 @@
             reel2.textContent = "🤡";
             reel3.textContent = "🤡";
 
-            // ✅ EFECTO PAYASO
             reel1.classList.add("payaso-win");
             reel2.classList.add("payaso-win");
             reel3.classList.add("payaso-win");
@@ -335,7 +359,6 @@
             reel2.textContent = "💎";
             reel3.textContent = "💎";
 
-            // ✅ EFECTO DIAMANTE
             reel1.classList.add("diamond-win");
             reel2.classList.add("diamond-win");
             reel3.classList.add("diamond-win");
@@ -346,7 +369,6 @@
             }, 1000);
           }
 
-          // ✅ SHAKE GENERAL
           slotWindow.classList.add("shake");
           setTimeout(() => slotWindow.classList.remove("shake"), 600);
 
