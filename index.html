@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>RED-B Slot</title>
+  <title>RED-B JACKPOT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet" />
   <style>
@@ -13,87 +13,146 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at top, #ff0040 0, #0b0014 55%, #000 100%);
+      background: radial-gradient(circle at top, #7b1fa2 0, #140022 50%, #020007 100%);
       color: #fff;
       font-family: "Montserrat", system-ui, sans-serif;
     }
 
     .container {
       width: 95%;
-      max-width: 420px;
-      background: rgba(6, 0, 20, 0.9);
-      border-radius: 24px;
-      padding: 20px 20px 26px;
-      box-shadow: 0 0 25px rgba(255, 0, 90, 0.8), 0 0 80px rgba(0, 255, 255, 0.3);
+      max-width: 460px;
+      background: radial-gradient(circle at top, rgba(123, 31, 162, 0.35), rgba(10, 0, 25, 0.95));
+      border-radius: 26px;
+      padding: 20px 18px 26px;
       text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow:
+        0 0 30px rgba(156, 39, 176, 0.9),
+        0 0 80px rgba(63, 81, 181, 0.5);
     }
 
     h1 {
       font-family: "Orbitron", system-ui;
-      font-size: 2rem;
+      font-size: 1.8rem;
       letter-spacing: 2px;
       text-transform: uppercase;
       margin-bottom: 6px;
-      color: #ff1744;
-      text-shadow: 0 0 12px rgba(255, 23, 68, 0.85);
+      color: #ffeb3b;
+      text-shadow:
+        0 0 12px rgba(255, 235, 59, 0.9),
+        0 0 18px rgba(255, 193, 7, 0.7);
     }
 
-    .sub { font-size: 0.9rem; color: #e0e0e0; margin-bottom: 14px; }
-    .sub strong { color: #ffd54f; }
+    .sub {
+      font-size: 0.9rem;
+      color: #e0e0ff;
+      margin-bottom: 10px;
+    }
 
-    .slot-machine { margin: 12px 0 18px; display: flex; justify-content: center; }
+    .sub strong {
+      color: #ffeb3b;
+    }
 
-    .slot-window {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
+    .jackpot-label {
+      font-family: "Orbitron", system-ui;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #ffe082;
+      margin-bottom: 6px;
+    }
+
+    .slot-wrapper {
+      margin: 12px 0 16px;
       padding: 10px;
-      border-radius: 18px;
-      background: linear-gradient(145deg, #1b0026, #42002b);
-      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      min-width: 240px;
-      transition: transform 0.2s ease;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #1a0030, #3a145c);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow:
+        inset 0 0 18px rgba(0, 0, 0, 0.9),
+        0 0 18px rgba(123, 31, 162, 0.7);
     }
 
-    @keyframes shake {
-      0% { transform: translateX(0); }
-      20% { transform: translateX(-6px); }
-      40% { transform: translateX(6px); }
-      60% { transform: translateX(-6px); }
-      80% { transform: translateX(6px); }
-      100% { transform: translateX(0); }
-    }
-    .shake { animation: shake 0.6s ease; }
-
-    .reel {
-      background: radial-gradient(circle at top, #ffffff 0, #e0e0e0 40%, #b0bec5 100%);
+    .slot-machine {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      padding: 8px;
       border-radius: 14px;
-      padding: 10px 0;
-      font-size: 2.1rem;
-      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6);
+      background: radial-gradient(circle at top, #eeeeff 0, #cfd8dc 45%, #90a4ae 100%);
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7);
+    }
+
+    .reel-column {
+      display: grid;
+      grid-template-rows: repeat(3, 1fr);
+      gap: 4px;
+    }
+
+    .cell {
+      height: 48px;
+      border-radius: 10px;
+      background: radial-gradient(circle at top, #ffffff 0, #eceff1 45%, #b0bec5 100%);
+      box-shadow:
+        inset 0 0 6px rgba(0, 0, 0, 0.5);
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 1.6rem;
       color: #000;
-      transition: transform 0.2s ease;
+      transition: transform 0.15s ease, filter 0.15s ease;
     }
 
-    @keyframes payasoPulse {
-      0% { transform: scale(1); filter: drop-shadow(0 0 0px #ffea00); }
-      50% { transform: scale(1.2); filter: drop-shadow(0 0 16px #ffea00); }
-      100% { transform: scale(1); filter: drop-shadow(0 0 0px #ffea00); }
+    .cell.win-highlight {
+      transform: scale(1.15);
+      filter: drop-shadow(0 0 12px #ffeb3b);
     }
-    .payaso-win { animation: payasoPulse 0.8s ease; }
 
+    /* Shake del gabinete */
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-5px); }
+      40% { transform: translateX(5px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+      100% { transform: translateX(0); }
+    }
+
+    .shake {
+      animation: shake 0.5s ease;
+    }
+
+    /* Efecto payaso / joker */
+    @keyframes jokerPulse {
+      0% { transform: scale(1); filter: drop-shadow(0 0 0px #ffeb3b); }
+      50% { transform: scale(1.2); filter: drop-shadow(0 0 16px #ffeb3b); }
+      100% { transform: scale(1); filter: drop-shadow(0 0 0px #ffeb3b); }
+    }
+    .joker-win {
+      animation: jokerPulse 0.8s ease;
+    }
+
+    /* Efecto bonus */
+    @keyframes bonusGlow {
+      0% { filter: drop-shadow(0 0 0px #ff9800); }
+      50% { filter: drop-shadow(0 0 16px #ff9800); }
+      100% { filter: drop-shadow(0 0 0px #ff9800); }
+    }
+    .bonus-win {
+      animation: bonusGlow 0.9s ease;
+    }
+
+    /* Efecto diamante */
     @keyframes diamondGlow {
-      0% { filter: drop-shadow(0 0 0px #00e5ff); }
-      50% { filter: drop-shadow(0 0 14px #00e5ff); }
-      100% { filter: drop-shadow(0 0 0px #00e5ff); }
+      0% { filter: drop-shadow(0 0 0px #80deea); }
+      50% { filter: drop-shadow(0 0 16px #80deea); }
+      100% { filter: drop-shadow(0 0 0px #80deea); }
     }
-    .diamond-win { animation: diamondGlow 1s ease; }
+    .diamond-win {
+      animation: diamondGlow 1s ease;
+    }
 
+    /* Botón GIRAR 3D */
     #spinBtn {
       margin-top: 4px;
       width: 100%;
@@ -102,78 +161,158 @@
       border: none;
       font-family: "Orbitron", system-ui;
       font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       cursor: pointer;
-      background: linear-gradient(135deg, #ff9100, #ff1744);
-      color: #fff;
+      background: radial-gradient(circle at top, #ffeb3b 0, #ff9800 40%, #e91e63 100%);
+      color: #2b0b24;
       box-shadow:
-        0 6px 0 rgba(120, 0, 30, 1),
-        0 0 18px rgba(255, 23, 68, 0.9);
+        0 6px 0 rgba(123, 31, 162, 1),
+        0 0 20px rgba(255, 235, 59, 0.9);
       transform: translateY(0);
       transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.1s ease;
     }
 
-    #spinBtn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: translateY(3px);
+    #spinBtn:hover:not(:disabled) {
+      filter: brightness(1.05);
     }
 
-    #mensaje { margin-top: 14px; min-height: 48px; font-size: 0.95rem; }
-    #mensaje.ok { color: #76ff03; text-shadow: 0 0 10px rgba(118, 255, 3, 0.7); font-weight: 700; }
-    #mensaje.error { color: #ff8a80; font-weight: 600; }
+    #spinBtn:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow:
+        0 3px 0 rgba(123, 31, 162, 1),
+        0 0 14px rgba(255, 235, 59, 0.7);
+    }
 
-    .info-intentos { margin-top: 10px; font-size: 0.85rem; color: #b3e5fc; }
+    #spinBtn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: translateY(3px);
+      box-shadow:
+        0 3px 0 rgba(80, 80, 80, 0.5),
+        0 0 8px rgba(120, 120, 120, 0.4);
+    }
+
+    #mensaje {
+      margin-top: 14px;
+      min-height: 60px;
+      font-size: 0.92rem;
+    }
+
+    #mensaje.ok {
+      color: #c6ff00;
+      text-shadow: 0 0 10px rgba(198, 255, 0, 0.8);
+      font-weight: 700;
+    }
+
+    #mensaje.error {
+      color: #ff8a80;
+      font-weight: 600;
+    }
+
+    .info-intentos {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #b3e5fc;
+    }
 
     .nota {
       display: block;
       margin-top: 14px;
       font-size: 0.75rem;
-      color: #aaaaaa;
+      color: #b0bec5;
+      line-height: 1.4;
+    }
+
+    .paytable {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: #ffe082;
       line-height: 1.4;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>RED-B Slot</h1>
+    <h1>RED-B JACKPOT</h1>
+    <p class="jackpot-label">Slot exclusivo promo RED-B</p>
     <p class="sub">
-      Tocá el botón y <strong>probá tu suerte</strong> 🎰
+      Tocá el botón y <strong>probá tu suerte</strong> en el jackpot 🎰
     </p>
 
-    <div class="slot-machine">
-      <div class="slot-window" id="slotWindow">
-        <div class="reel" id="reel1">🍒</div>
-        <div class="reel" id="reel2">🍋</div>
-        <div class="reel" id="reel3">⭐</div>
+    <div class="slot-wrapper" id="slotWrapper">
+      <div class="slot-machine" id="slotMachine">
+        <!-- 5 columnas × 3 filas -->
+        <div class="reel-column">
+          <div class="cell" data-row="0" data-col="0">💎</div>
+          <div class="cell" data-row="1" data-col="0">👑</div>
+          <div class="cell" data-row="2" data-col="0">🔔</div>
+        </div>
+        <div class="reel-column">
+          <div class="cell" data-row="0" data-col="1">💠</div>
+          <div class="cell" data-row="1" data-col="1">🃏</div>
+          <div class="cell" data-row="2" data-col="1">⭐</div>
+        </div>
+        <div class="reel-column">
+          <div class="cell" data-row="0" data-col="2">👑</div>
+          <div class="cell" data-row="1" data-col="2">💠</div>
+          <div class="cell" data-row="2" data-col="2">💎</div>
+        </div>
+        <div class="reel-column">
+          <div class="cell" data-row="0" data-col="3">🔔</div>
+          <div class="cell" data-row="1" data-col="3">⭐</div>
+          <div class="cell" data-row="2" data-col="3">🃏</div>
+        </div>
+        <div class="reel-column">
+          <div class="cell" data-row="0" data-col="4">💎</div>
+          <div class="cell" data-row="1" data-col="4">👑</div>
+          <div class="cell" data-row="2" data-col="4">💠</div>
+        </div>
       </div>
     </div>
 
-    <button id="spinBtn">TIRAR SLOT RED-B</button>
+    <button id="spinBtn">GIRAR RED-B JACKPOT</button>
 
-    <p class="info-intentos">Probá tu suerte. Un intento por día.</p>
+    <p class="info-intentos">Un intento por día por dispositivo.</p>
 
     <div id="mensaje"></div>
 
+    <div class="paytable">
+      🃏 3 JOKER en la línea central → <strong>500 fichas</strong><br>
+      ⭐ 3 BONUS en la línea central → <strong>300 fichas</strong><br>
+      💎 3 DIAMANTES en la línea central → <strong>200 fichas</strong><br>
+      Los premios son en fichas RED-B.
+    </div>
+
     <small class="nota">
-      Si tenés premio, sacá captura y enviála a la línea.  
-      Los premios son en fichas.  
-      Promoción RED-B.
+      Si tenés premio, sacá captura y enviála a la línea de RED-B junto con tu código.  
+      Promoción RED-B JACKPOT.
     </small>
   </div>
 
   <script>
-    const MAX_PREMIOS_500 = 10;
-    const MAX_PREMIOS_200 = 10;
-    const STORAGE_KEY = "redb_slot_state_v4";
+    // CONFIG PREMIOS POR DÍA
+    const MAX_PREMIOS_JOKER = 10;  // 🃏 500 fichas
+    const MAX_PREMIOS_BONUS = 10;  // ⭐ 300 fichas
+    const MAX_PREMIOS_DIAMANTE = 10; // 💎 200 fichas
 
-    const simbolos = ["🍒","🍋","⭐","7️⃣","💎","🔔","🍀","🤡"];
+    const STORAGE_KEY = "redb_jackpot_state_v1";
 
-    const reel1 = document.getElementById("reel1");
-    const reel2 = document.getElementById("reel2");
-    const reel3 = document.getElementById("reel3");
+    // Símbolos (por ahora emojis; luego se pueden reemplazar por imágenes)
+    const SYMBOLS = ["🃏", "⭐", "💎", "👑", "🔔", "💠"];
+
+    // Mapeo de premios
+    const PRIZE_MAP = {
+      "🃏": { tipo: "J", fichas: 500, key: "usadosJoker", max: MAX_PREMIOS_JOKER },
+      "⭐": { tipo: "B", fichas: 300, key: "usadosBonus", max: MAX_PREMIOS_BONUS },
+      "💎": { tipo: "D", fichas: 200, key: "usadosDiamante", max: MAX_PREMIOS_DIAMANTE }
+    };
+
+    const slotMachine = document.getElementById("slotMachine");
+    const cells = Array.from(slotMachine.querySelectorAll(".cell"));
     const spinBtn = document.getElementById("spinBtn");
     const mensaje = document.getElementById("mensaje");
-    const slotWindow = document.getElementById("slotWindow");
+    const slotWrapper = document.getElementById("slotWrapper");
 
     function hoyString() {
       const h = new Date();
@@ -185,11 +324,30 @@
         const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
         const hoy = hoyString();
         if (!data || data.fecha !== hoy) {
-          return { fecha: hoy, usados500: 0, usados200: 0, yaJugoHoy: false };
+          return {
+            fecha: hoy,
+            usadosJoker: 0,
+            usadosBonus: 0,
+            usadosDiamante: 0,
+            yaJugoHoy: false
+          };
         }
-        return data;
+        return {
+          fecha: data.fecha || hoy,
+          usadosJoker: data.usadosJoker || 0,
+          usadosBonus: data.usadosBonus || 0,
+          usadosDiamante: data.usadosDiamante || 0,
+          yaJugoHoy: !!data.yaJugoHoy
+        };
       } catch {
-        return { fecha: hoyString(), usados500: 0, usados200: 0, yaJugoHoy: false };
+        const hoy = hoyString();
+        return {
+          fecha: hoy,
+          usadosJoker: 0,
+          usadosBonus: 0,
+          usadosDiamante: 0,
+          yaJugoHoy: false
+        };
       }
     }
 
@@ -199,37 +357,58 @@
 
     function mensajeInfo(texto, tipo = null) {
       mensaje.innerHTML = texto;
-      mensaje.classList.remove("ok","error");
+      mensaje.classList.remove("ok", "error");
       if (tipo === "ok") mensaje.classList.add("ok");
       if (tipo === "error") mensaje.classList.add("error");
     }
 
     function simboloRandom() {
-      return simbolos[Math.floor(Math.random() * simbolos.length)];
+      return SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
     }
 
-    function animarSlot(callbackFin) {
-      const dur = 900;
+    // Animar columnas secuenciales
+    function girarColumna(colIndex, duracion, callbackFin) {
+      const colCells = cells.filter(c => parseInt(c.dataset.col, 10) === colIndex);
       const start = performance.now();
+
       function frame(now) {
-        if (now - start < dur) {
-          reel1.textContent = simboloRandom();
-          reel2.textContent = simboloRandom();
-          reel3.textContent = simboloRandom();
+        if (now - start < duracion) {
+          colCells.forEach(cell => {
+            cell.textContent = simboloRandom();
+          });
           requestAnimationFrame(frame);
         } else {
-          const f1 = simboloRandom();
-          const f2 = simboloRandom();
-          const f3 = simboloRandom();
-          reel1.textContent = f1;
-          reel2.textContent = f2;
-          reel3.textContent = f3;
-          callbackFin({ f1, f2, f3 });
+          // Fijar símbolo final de esta columna (arriba, centro, abajo)
+          colCells.forEach(cell => {
+            cell.textContent = simboloRandom();
+          });
+          callbackFin && callbackFin();
         }
       }
+
       requestAnimationFrame(frame);
     }
 
+    // Gira las 5 columnas una tras otra
+    function animarRodillosSecuencial(callbackFin) {
+      const durBase = 550; // ms
+      let col = 0;
+
+      function next() {
+        if (col < 5) {
+          girarColumna(col, durBase + col * 120, () => {
+            col++;
+            next();
+          });
+        } else {
+          callbackFin && callbackFin();
+        }
+      }
+
+      next();
+    }
+
+    // Código anti-estafa
     function generarCodigo(tipoPremio) {
       const ahora = new Date();
       const y = ahora.getFullYear();
@@ -238,13 +417,16 @@
       const hh = String(ahora.getHours()).padStart(2,"0");
       const mm = String(ahora.getMinutes()).padStart(2,"0");
       const ss = String(ahora.getSeconds()).padStart(2,"0");
+
       const base = `${y}${m}${d}${hh}${mm}${ss}`;
       const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
       let rand = "";
       for (let i = 0; i < 4; i++) {
         rand += chars[Math.floor(Math.random() * chars.length)];
       }
-      return `REDB-${tipoPremio}-${base}-${rand}`;
+
+      // REDB-JACK-<tipo>-<fecha-hora>-<random>
+      return `REDBJACK-${tipoPremio}-${base}-${rand}`;
     }
 
     function formatearFechaHora() {
@@ -255,39 +437,91 @@
       const hh = String(ahora.getHours()).padStart(2,"0");
       const mm = String(ahora.getMinutes()).padStart(2,"0");
       const ss = String(ahora.getSeconds()).padStart(2,"0");
-      return { fecha:`${d}/${m}/${y}`, hora:`${hh}:${mm}:${ss}` };
+      return { fecha: `${d}/${m}/${y}`, hora: `${hh}:${mm}:${ss}` };
     }
 
-    function mostrarPremio(tipoPremio) {
-      let textoPremio = tipoPremio === "G"
-        ? "🎉 ¡GANASTE <strong>500 FICHAS</strong>! 🎉"
-        : "🎉 ¡GANASTE <strong>200 FICHAS</strong>! 🎉";
+    // Busca 3 consecutivos iguales en la línea central (fila 1) entre las 5 columnas
+    function evaluarLineaCentral() {
+      const lineaCentral = [];
+      for (let col = 0; col < 5; col++) {
+        const cell = cells.find(c => parseInt(c.dataset.col, 10) === col && parseInt(c.dataset.row, 10) === 1);
+        lineaCentral.push({ col, simbolo: cell.textContent, cell });
+      }
 
-      const simbolo = tipoPremio === "G" ? "🤡" : "💎";
-      reel1.textContent = simbolo;
-      reel2.textContent = simbolo;
-      reel3.textContent = simbolo;
+      let mejorPremio = null;
+      let mejorRun = null;
 
-      const animClass = tipoPremio === "G" ? "payaso-win" : "diamond-win";
-      reel1.classList.add(animClass);
-      reel2.classList.add(animClass);
-      reel3.classList.add(animClass);
-      setTimeout(() => {
-        reel1.classList.remove(animClass);
-        reel2.classList.remove(animClass);
-        reel3.classList.remove(animClass);
-      }, 1000);
+      let currentSymbol = lineaCentral[0].simbolo;
+      let runStart = 0;
+      let runLength = 1;
 
-      slotWindow.classList.add("shake");
-      setTimeout(() => slotWindow.classList.remove("shake"), 600);
+      function cerrarRun(indexFinalNoIncluido) {
+        if (runLength >= 3 && PRIZE_MAP[currentSymbol]) {
+          const infoPremio = PRIZE_MAP[currentSymbol];
+          if (!mejorPremio || infoPremio.fichas > mejorPremio.fichas) {
+            mejorPremio = infoPremio;
+            mejorRun = {
+              simbolo: currentSymbol,
+              startCol: runStart,
+              endCol: indexFinalNoIncluido - 1
+            };
+          }
+        }
+      }
+
+      for (let i = 1; i < lineaCentral.length; i++) {
+        if (lineaCentral[i].simbolo === currentSymbol) {
+          runLength++;
+        } else {
+          cerrarRun(i);
+          currentSymbol = lineaCentral[i].simbolo;
+          runStart = i;
+          runLength = 1;
+        }
+      }
+      cerrarRun(lineaCentral.length);
+
+      if (mejorPremio && mejorRun) {
+        const celdasGanadoras = lineaCentral
+          .filter(item => item.col >= mejorRun.startCol && item.col <= mejorRun.endCol)
+          .map(item => item.cell);
+        return { premio: mejorPremio, celdas: celdasGanadoras };
+      }
+
+      return null;
+    }
+
+    function limpiarResaltados() {
+      cells.forEach(cell => {
+        cell.classList.remove("win-highlight", "joker-win", "bonus-win", "diamond-win");
+      });
+    }
+
+    function mostrarPremio(premioInfo, celdas) {
+      limpiarResaltados();
+
+      celdas.forEach(cell => {
+        cell.classList.add("win-highlight");
+      });
+
+      if (premioInfo.tipo === "J") {
+        celdas.forEach(c => c.classList.add("joker-win"));
+      } else if (premioInfo.tipo === "B") {
+        celdas.forEach(c => c.classList.add("bonus-win"));
+      } else if (premioInfo.tipo === "D") {
+        celdas.forEach(c => c.classList.add("diamond-win"));
+      }
+
+      slotWrapper.classList.add("shake");
+      setTimeout(() => slotWrapper.classList.remove("shake"), 600);
 
       const { fecha, hora } = formatearFechaHora();
-      const codigo = generarCodigo(tipoPremio);
+      const codigo = generarCodigo(premioInfo.tipo);
 
       mensajeInfo(`
-        ${textoPremio}<br>
+        🎉 ¡GANASTE <strong>${premioInfo.fichas} FICHAS</strong>! 🎉<br>
         <small>
-        Premio en fichas RED-B.<br>
+        Premio en fichas RED-B JACKPOT.<br>
         Fecha: ${fecha} - ${hora}<br>
         Código: ${codigo}<br><br>
         ✅ YA TE SALIÓ PREMIO<br>
@@ -295,7 +529,7 @@
         </small>
       `, "ok");
 
-      spinBtn.disabled = true; // ✅ NO PUEDE VOLVER A TOCAR
+      spinBtn.disabled = true;
     }
 
     function jugar() {
@@ -303,38 +537,49 @@
 
       if (estado.yaJugoHoy) {
         mensajeInfo("Ya jugaste hoy. Volvé mañana 🔁", "error");
+        spinBtn.disabled = true;
         return;
       }
 
       spinBtn.disabled = true;
-      mensajeInfo("Girando... 🎰");
+      limpiarResaltados();
+      mensajeInfo("Girando rodillos... 🎰", null);
 
-      animarSlot(({ f1, f2, f3 }) => {
+      animarRodillosSecuencial(() => {
         estado.yaJugoHoy = true;
-        let tipoPremio = null;
 
-        if (f1 === f2 && f2 === f3) {
-          if (f1 === "🤡" && estado.usados500 < MAX_PREMIOS_500) {
-            tipoPremio = "G";
-            estado.usados500 += 1;
-          } else if (f1 === "💎" && estado.usados200 < MAX_PREMIOS_200) {
-            tipoPremio = "C";
-            estado.usados200 += 1;
+        const resultado = evaluarLineaCentral();
+
+        if (resultado) {
+          const { premio, celdas } = resultado;
+          const usadoActual = estado[premio.key] || 0;
+          if (usadoActual < premio.max) {
+            estado[premio.key] = usadoActual + 1;
+            guardarEstado(estado);
+            mostrarPremio(premio, celdas);
+          } else {
+            guardarEstado(estado);
+            mensajeInfo("Hoy ya se entregaron todos los premios de ese tipo. 🙈 Volvé mañana.", "error");
           }
-        }
-
-        guardarEstado(estado);
-
-        if (tipoPremio) {
-          mostrarPremio(tipoPremio);
         } else {
+          guardarEstado(estado);
           mensajeInfo("Hoy no tocó premio 🙈 Volvé mañana.", "error");
-          spinBtn.disabled = true; // tampoco puede reintentar
         }
       });
     }
 
-    mensajeInfo("Tenés 1 intento hoy. ¡Suerte! 🍀");
+    // Estado inicial UI
+    (function init() {
+      const estado = cargarEstado();
+      if (estado.yaJugoHoy) {
+        spinBtn.disabled = true;
+        mensajeInfo("Ya jugaste hoy. Volvé mañana 🔁", "error");
+      } else {
+        spinBtn.disabled = false;
+        mensajeInfo("Tenés 1 intento hoy. ¡Suerte! 🍀", "ok");
+      }
+    })();
+
     spinBtn.addEventListener("click", jugar);
   </script>
 </body>
