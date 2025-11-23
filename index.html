@@ -81,7 +81,7 @@
       gap: 4px;
     }
 
-    /* ✅ EMOJIS GRANDES */
+    /* EMOJIS GRANDES */
     .cell {
       height: 68px;
       border-radius: 10px;
@@ -150,7 +150,7 @@
       line-height: 1.4;
     }
 
-    /* ✅ TABLA EN 2 COLUMNAS */
+    /* TABLA EN 2 COLUMNAS */
     .paytable {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -162,7 +162,6 @@
     }
 
     .pay-block strong { color: #fff; }
-
   </style>
 </head>
 <body>
@@ -207,7 +206,7 @@
 
     <div id="mensaje"></div>
 
-    <!-- ✅ TABLA DE PREMIOS EN 2 COLUMNAS -->
+    <!-- TABLA DE PREMIOS EN 2 COLUMNAS (marketing, pero solo paga 3 iguales) -->
     <div class="paytable">
 
       <div class="pay-block">
@@ -255,16 +254,18 @@
 
   <script>
     const MAX_INTENTOS_DIA = 3;
-    const STORAGE_KEY = "redb_jackpot_state_v9";
+    const STORAGE_KEY = "redb_jackpot_state_v10";
 
+    // Joker incluido para decorar, pero no paga
     const SYMBOLS = ["⭐", "💎", "👑", "🔔", "💠", "🃏"];
 
+    // Solo se usan los premios de 3 iguales
     const PRIZES = {
-      "⭐": { 3: 500, 4: 1000 },
-      "💎": { 3: 1000, 4: 2500 },
-      "👑": { 3: 100, 4: 300 },
-      "🔔": { 3: 1000, 4: 3000 },
-      "💠": { 3: 2000, 4: 4000 }
+      "⭐": { 3: 500 },
+      "💎": { 3: 1000 },
+      "👑": { 3: 100 },
+      "🔔": { 3: 1000 },
+      "💠": { 3: 2000 }
     };
 
     const slotMachine = document.getElementById("slotMachine");
@@ -317,6 +318,14 @@
       return ["⭐", "💎", "👑", "🔔", "💠"][Math.floor(Math.random() * 5)];
     }
 
+    function simboloRandomSinJokerDistinto(avoid) {
+      let s;
+      do {
+        s = simboloRandomSinJoker();
+      } while (s === avoid);
+      return s;
+    }
+
     function girarColumna(colIndex, duracion, callbackFin) {
       const colCells = cells.filter(c => parseInt(c.dataset.col, 10) === colIndex);
       const start = performance.now();
@@ -349,7 +358,8 @@
           });
         } else {
           evitar5Iguales();
-          evitarJoker();
+          evitar4DesdePrimeraColumna();
+          evitarJokerAlineado();
           callbackFin && callbackFin();
         }
       }
@@ -357,6 +367,7 @@
       next();
     }
 
+    // Evitar 5 iguales en cualquier fila
     function evitar5Iguales() {
       for (let row = 0; row < 3; row++) {
         const fila = [];
@@ -365,12 +376,29 @@
         }
         const symbol0 = fila[0].textContent;
         if (fila.every(c => c.textContent === symbol0)) {
-          fila[2].textContent = simboloRandomSinJoker();
+          // Rompo en la columna central
+          fila[2].textContent = simboloRandomSinJokerDistinto(symbol0);
         }
       }
     }
 
-    function evitarJoker() {
+    // ✅ Evitar 4 iguales seguidos empezando en la 1° columna
+    function evitar4DesdePrimeraColumna() {
+      for (let row = 0; row < 3; row++) {
+        const c0 = cells.find(c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === 0);
+        const c1 = cells.find(c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === 1);
+        const c2 = cells.find(c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === 2);
+        const c3 = cells.find(c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === 3);
+        const s0 = c0.textContent;
+        if (s0 !== "🃏" && c1.textContent === s0 && c2.textContent === s0 && c3.textContent === s0) {
+          // Rompo la 3° columna para que quede solo 3 iguales como máximo
+          c3.textContent = simboloRandomSinJokerDistinto(s0);
+        }
+      }
+    }
+
+    // Evitar que el Joker se alinee (mito)
+    function evitarJokerAlineado() {
       for (let row = 0; row < 3; row++) {
         let count = 0;
         let start = -1;
@@ -433,6 +461,7 @@
       return grid;
     }
 
+    // Solo paga 3 iguales, mejor línea, empezando en 1° columna
     function evaluarGanadores() {
       const grid = obtenerGrid();
       let mejorPremio = null;
@@ -453,9 +482,10 @@
           } else break;
         }
 
-        if (PRIZES[simbolo][len]) {
-          if (!mejorPremio || PRIZES[simbolo][len] > mejorPremio.fichas) {
-            mejorPremio = { simbolo, cantidad: len, fichas: PRIZES[simbolo][len] };
+        if (len === 3 && PRIZES[simbolo][3]) {
+          const fichas = PRIZES[simbolo][3];
+          if (!mejorPremio || fichas > mejorPremio.fichas) {
+            mejorPremio = { simbolo, cantidad: 3, fichas };
             mejoresCeldas = runCells.slice();
           }
         }
@@ -492,7 +522,7 @@
       mensajeInfo(`
         🎉 ¡GANASTE <strong>${premioInfo.fichas} FICHAS</strong>! 🎉<br>
         <small>
-        Combinación: ${premioInfo.cantidad} símbolos ${premioInfo.simbolo}<br>
+        Combinación: 3 símbolos ${premioInfo.simbolo}<br>
         Fecha: ${fecha} - ${hora}<br>
         Código: ${codigo}<br><br>
         ✅ YA TE SALIÓ PREMIO<br>
