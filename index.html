@@ -206,8 +206,8 @@
     const MAX_PREMIOS_500 = 10;  // 🤡 500 fichas
     const MAX_PREMIOS_200 = 10;  // 💎 200 fichas
 
-    // 🔥 MODO PRUEBA: poné true para que SIEMPRE salga premio (para probar animaciones)
-    // Cuando lo vayas a usar con clientes, CAMBIAR A false
+    // 🔥 MODO PRUEBA: true = siempre da premio (para que veas cómo queda)
+    // Cuando lo uses con clientes, cambiá a false
     const MODO_TEST = true;
 
     const STORAGE_KEY = "redb_slot_state_v3";
@@ -316,6 +316,7 @@
 
     function mostrarPremio(tipoPremio) {
       // tipoPremio: "G" (500 fichas - payaso) o "C" (200 fichas - diamante)
+      let textoPremio = "";
 
       if (tipoPremio === "G") {
         reel1.textContent = "🤡";
@@ -330,6 +331,8 @@
           reel2.classList.remove("payaso-win");
           reel3.classList.remove("payaso-win");
         }, 800);
+
+        textoPremio = "🎉 ¡GANASTE <strong>500 FICHAS</strong>! 🎉";
       } else {
         reel1.textContent = "💎";
         reel2.textContent = "💎";
@@ -343,6 +346,8 @@
           reel2.classList.remove("diamond-win");
           reel3.classList.remove("diamond-win");
         }, 1000);
+
+        textoPremio = "🎉 ¡GANASTE <strong>200 FICHAS</strong>! 🎉";
       }
 
       slotWindow.classList.add("shake");
@@ -352,8 +357,9 @@
       const codigo = generarCodigo(tipoPremio);
 
       mensajeInfo(`
-        🎉 ¡TENÉS PREMIO EN FICHAS! 📲<br>
+        ${textoPremio}<br>
         <small>
+        Premio en fichas RED-B.<br>
         Fecha: ${fecha} - ${hora}<br>
         Código: ${codigo}
         </small>
@@ -369,25 +375,27 @@
       }
 
       spinBtn.disabled = true;
-      mensajeInfo(MODO_TEST ? "MODO PRUEBA: forzando premio para ver animación 👀" : "Girando... 🎰");
+      mensajeInfo(
+        MODO_TEST
+          ? "MODO PRUEBA: forzando premio para ver animación 👀"
+          : "Girando... 🎰"
+      );
 
       animarSlot(({ f1, f2, f3 }) => {
         let tipoPremio = null;
 
         if (MODO_TEST) {
-          // En modo prueba: elegimos al azar entre premio grande y chico
+          // Modo prueba: elegimos al azar entre premio grande y chico
           tipoPremio = Math.random() < 0.5 ? "G" : "C";
-          // NO tocamos estado (no gasta intentos ni premios reales)
         } else {
-          // MODO NORMAL
+          // Modo normal
           estado.yaJugoHoy = true;
 
           if (f1 === f2 && f2 === f3) {
             if (f1 === "🤡" && estado.usados500 < MAX_PREMIOS_500) {
               tipoPremio = "G";
               estado.usados500 += 1;
-            }
-            else if (f1 === "💎" && estado.usados200 < MAX_PREMIOS_200) {
+            } else if (f1 === "💎" && estado.usados200 < MAX_PREMIOS_200) {
               tipoPremio = "C";
               estado.usados200 += 1;
             }
