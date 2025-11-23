@@ -54,6 +54,22 @@
       box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.12);
       min-width: 240px;
+      /* ANIMACIÓN DE SHAKE */
+      transition: transform 0.2s ease;
+    }
+
+    /* ✅ SHAKE ANIMATION */
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+      100% { transform: translateX(0); }
+    }
+
+    .shake {
+      animation: shake 0.6s ease;
     }
 
     .reel {
@@ -112,11 +128,11 @@
   <div class="container">
     <h1>RED-B Slot</h1>
     <p class="sub">
-      Tocá el botón y fijate si te llevás <strong>PREMIO</strong> 🎰
+      Tocá el botón y fijate si tenés <strong>PREMIO</strong> 🎰
     </p>
 
     <div class="slot-machine">
-      <div class="slot-window">
+      <div class="slot-window" id="slotWindow">
         <div class="reel" id="reel1">🍒</div>
         <div class="reel" id="reel2">🍋</div>
         <div class="reel" id="reel3">⭐</div>
@@ -125,7 +141,7 @@
 
     <button id="spinBtn">TIRAR SLOT RED-B</button>
 
-    <p id="premiosRestantes">Premios restantes hoy: 10</p>
+    <p id="premiosRestantes">MUCHOS PREMIOS HOY</p>
 
     <div id="mensaje"></div>
 
@@ -137,8 +153,8 @@
 
   <script>
     const MAX_PREMIOS_DIA = 10;
-    const PROB_GANAR = 0.30;
     const STORAGE_KEY = "redb_slot_state";
+
     const simbolos = ["🍒","🍋","⭐","7️⃣","💎","🔔","🍀"];
 
     const reel1 = document.getElementById("reel1");
@@ -147,6 +163,7 @@
     const spinBtn = document.getElementById("spinBtn");
     const mensaje = document.getElementById("mensaje");
     const premiosRestantesEl = document.getElementById("premiosRestantes");
+    const slotWindow = document.getElementById("slotWindow");
 
     function hoyString() {
       const h = new Date();
@@ -202,7 +219,7 @@
           reel1.textContent = f1;
           reel2.textContent = f2;
           reel3.textContent = f3;
-          callbackFin();
+          callbackFin({ f1, f2, f3 });
         }
       }
       requestAnimationFrame(frame);
@@ -220,21 +237,28 @@
       spinBtn.disabled = true;
       mensajeInfo("Girando... 🎰");
 
-      animarSlot(() => {
+      animarSlot(({ f1, f2, f3 }) => {
         estado.yaJugoHoy = true;
-        let gano = false;
 
-        if (restantes > 0 && Math.random() < PROB_GANAR) {
-          gano = true;
-          estado.premiosOtorgados += 1;
-        }
-
-        guardarEstado(estado);
-        actualizarUI(estado);
+        const gano = restantes > 0 && f1 === "💎" && f2 === "💎" && f3 === "💎";
 
         if (gano) {
-          mensajeInfo("🎉 ¡GANASTE 500 FICHAS! SI TENÉS PREMIO, SACÁ CAPTURA Y ENVIÁLA A LA LÍNEA 📲", "ok");
+          estado.premiosOtorgados += 1;
+          guardarEstado(estado);
+          actualizarUI(estado);
+
+          reel1.textContent = "💎";
+          reel2.textContent = "💎";
+          reel3.textContent = "💎";
+
+          // ✅ ACTIVA EL SHAKE
+          slotWindow.classList.add("shake");
+          setTimeout(() => slotWindow.classList.remove("shake"), 600);
+
+          mensajeInfo("🎉 ¡TENÉS PREMIO! SACÁ CAPTURA Y ENVIÁLA A LA LÍNEA 📲", "ok");
         } else {
+          guardarEstado(estado);
+          actualizarUI(estado);
           mensajeInfo("Hoy no tocó premio 🙈 Volvé mañana.", "error");
         }
 
