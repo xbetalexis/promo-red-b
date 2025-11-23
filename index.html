@@ -206,8 +206,14 @@
 
     <div id="mensaje"></div>
 
-    <!-- TABLA DE PREMIOS EN 2 COLUMNAS (marketing, pero solo paga 3 iguales) -->
+    <!-- TABLA DE PREMIOS EN 2 COLUMNAS -->
     <div class="paytable">
+      <div class="pay-block">
+        🃏 <strong>JOKER JACKPOT</strong><br>
+        • 5 🃏 → <strong>50K fichas</strong><br>
+        • 4 🃏 → <strong>15K fichas</strong><br>
+        • 3 🃏 → <strong>10K fichas</strong>
+      </div>
 
       <div class="pay-block">
         ⭐ <strong>ESTRELLAS</strong><br>
@@ -238,12 +244,6 @@
         • 4 💠 → <strong>4K fichas</strong><br>
         • 3 💠 → <strong>2K fichas</strong>
       </div>
-
-      <div class="pay-block">
-        🃏 <strong>JOKER JACKPOT</strong><br>
-        (Solo mito 😈 — nunca sale ni paga)
-      </div>
-
     </div>
 
     <small class="nota">
@@ -256,7 +256,7 @@
     const MAX_INTENTOS_DIA = 3;
     const STORAGE_KEY = "redb_jackpot_state_v10";
 
-    // Joker incluido para decorar, pero no paga
+    // Joker incluido para decorar (jackpot visual), pero NO paga
     const SYMBOLS = ["⭐", "💎", "👑", "🔔", "💠", "🃏"];
 
     // Solo se usan los premios de 3 iguales
@@ -266,6 +266,7 @@
       "👑": { 3: 100 },
       "🔔": { 3: 1000 },
       "💠": { 3: 2000 }
+      // 🃏 no tiene premio real
     };
 
     const slotMachine = document.getElementById("slotMachine");
@@ -337,6 +338,7 @@
         } else {
           colCells.forEach(cell => {
             const row = parseInt(cell.dataset.row, 10);
+            // Fila central sin Joker para que no se alinee
             cell.textContent = row === 1 ? simboloRandomSinJoker() : simboloRandom();
           });
           callbackFin && callbackFin();
@@ -357,8 +359,7 @@
             next();
           });
         } else {
-          evitar5Iguales();
-          evitar4DesdePrimeraColumna();
+          evitar4y5Horizontales();
           evitarJokerAlineado();
           callbackFin && callbackFin();
         }
@@ -367,37 +368,44 @@
       next();
     }
 
-    // Evitar 5 iguales en cualquier fila
-    function evitar5Iguales() {
+    // ❌ Nunca mostrar 4 ni 5 seguidos de ningún símbolo (solo máximo 3)
+    function evitar4y5Horizontales() {
       for (let row = 0; row < 3; row++) {
         const fila = [];
         for (let col = 0; col < 5; col++) {
-          fila.push(cells.find(c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === col));
+          const cell = cells.find(
+            c => parseInt(c.dataset.row, 10) === row && parseInt(c.dataset.col, 10) === col
+          );
+          fila.push(cell);
         }
-        const symbol0 = fila[0].textContent;
-        if (fila.every(c => c.textContent === symbol0)) {
-          // Rompo en la columna central
-          fila[2].textContent = simboloRandomSinJokerDistinto(symbol0);
+
+        let currentSymbol = fila[0].textContent;
+        let runStart = 0;
+        let runLength = 1;
+
+        function romperRun(start, length, symbol) {
+          if (length >= 4 && symbol !== "🃏") {
+            const breakIndex = start + 1; // rompo la segunda ficha de la racha
+            const breakCell = fila[breakIndex];
+            breakCell.textContent = simboloRandomSinJokerDistinto(symbol);
+          }
+        }
+
+        for (let i = 1; i <= fila.length; i++) {
+          const symbol = i < fila.length ? fila[i].textContent : null;
+          if (symbol === currentSymbol) {
+            runLength++;
+          } else {
+            romperRun(runStart, runLength, currentSymbol);
+            currentSymbol = symbol;
+            runStart = i;
+            runLength = 1;
+          }
         }
       }
     }
 
-    // ✅ Evitar 4 iguales seguidos empezando en la 1° columna
-    function evitar4DesdePrimeraColumna() {
-      for (let row = 0; row < 3; row++) {
-        const c0 = cells.find(c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === 0);
-        const c1 = cells.find(c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === 1);
-        const c2 = cells.find(c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === 2);
-        const c3 = cells.find(c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === 3);
-        const s0 = c0.textContent;
-        if (s0 !== "🃏" && c1.textContent === s0 && c2.textContent === s0 && c3.textContent === s0) {
-          // Rompo la 3° columna para que quede solo 3 iguales como máximo
-          c3.textContent = simboloRandomSinJokerDistinto(s0);
-        }
-      }
-    }
-
-    // Evitar que el Joker se alinee (mito)
+    // Evitar que el Joker se alinee (jamás 3 seguidos de 🃏)
     function evitarJokerAlineado() {
       for (let row = 0; row < 3; row++) {
         let count = 0;
@@ -405,14 +413,20 @@
         for (let col = 0; col <= 5; col++) {
           let simbolo = null;
           if (col < 5) {
-            simbolo = cells.find(c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === col).textContent;
+            simbolo = cells.find(
+              c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === col
+            ).textContent;
           }
+
           if (simbolo === "🃏") {
             if (count === 0) start = col;
             count++;
           } else {
             if (count >= 2) {
-              const cell = cells.find(c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === start + 1);
+              // si había 2 o más Joker seguidos, rompo uno en el medio
+              const cell = cells.find(
+                c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === start + 1
+              );
               cell.textContent = simboloRandomSinJoker();
             }
             count = 0;
@@ -453,7 +467,9 @@
       for (let row = 0; row < 3; row++) {
         const fila = [];
         for (let col = 0; col < 5; col++) {
-          const cell = cells.find(c => parseInt(c.dataset.row) === row && parseInt(c.dataset.col) === col);
+          const cell = cells.find(
+            c => parseInt(c.dataset.row, 10) === row && parseInt(c.dataset.col, 10) === col
+          );
           fila.push({ simbolo: cell.textContent, cell });
         }
         grid.push(fila);
@@ -470,7 +486,7 @@
       function evaluarLinea(positions) {
         const first = positions[0];
         const simbolo = grid[first.r][first.c].simbolo;
-        if (!PRIZES[simbolo]) return;
+        if (!PRIZES[simbolo]) return; // Joker fuera
         const runCells = [grid[first.r][first.c].cell];
         let len = 1;
 
