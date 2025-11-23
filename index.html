@@ -53,6 +53,15 @@
       color: #ffeb3b;
     }
 
+    .jackpot-label {
+      font-family: "Orbitron", system-ui;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #ffe082;
+      margin-bottom: 6px;
+    }
+
     .slot-wrapper {
       margin: 12px 0 16px;
       padding: 10px;
@@ -94,8 +103,12 @@
       transition: transform 0.15s ease, filter 0.15s ease;
     }
 
-    .win-highlight { transform: scale(1.15); filter: drop-shadow(0 0 12px #ffeb3b); }
+    .cell.win-highlight {
+      transform: scale(1.15);
+      filter: drop-shadow(0 0 12px #ffeb3b);
+    }
 
+    /* Shake del gabinete */
     @keyframes shake {
       0% { transform: translateX(0); }
       20% { transform: translateX(-5px); }
@@ -104,69 +117,156 @@
       80% { transform: translateX(5px); }
       100% { transform: translateX(0); }
     }
-    .shake { animation: shake 0.5s ease; }
 
-    @keyframes jokerPulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.2); filter: drop-shadow(0 0 16px #ffeb3b); }
-      100% { transform: scale(1); }
+    .shake {
+      animation: shake 0.5s ease;
     }
-    .joker-win { animation: jokerPulse 0.8s ease; }
 
+    /* Efecto payaso / joker */
+    @keyframes jokerPulse {
+      0% { transform: scale(1); filter: drop-shadow(0 0 0px #ffeb3b); }
+      50% { transform: scale(1.2); filter: drop-shadow(0 0 16px #ffeb3b); }
+      100% { transform: scale(1); filter: drop-shadow(0 0 0px #ffeb3b); }
+    }
+    .joker-win {
+      animation: jokerPulse 0.8s ease;
+    }
+
+    /* Efecto bonus */
+    @keyframes bonusGlow {
+      0% { filter: drop-shadow(0 0 0px #ff9800); }
+      50% { filter: drop-shadow(0 0 16px #ff9800); }
+      100% { filter: drop-shadow(0 0 0px #ff9800); }
+    }
+    .bonus-win {
+      animation: bonusGlow 0.9s ease;
+    }
+
+    /* Efecto diamante */
+    @keyframes diamondGlow {
+      0% { filter: drop-shadow(0 0 0px #80deea); }
+      50% { filter: drop-shadow(0 0 16px #80deea); }
+      100% { filter: drop-shadow(0 0 0px #80deea); }
+    }
+    .diamond-win {
+      animation: diamondGlow 1s ease;
+    }
+
+    /* Botón GIRAR 3D */
     #spinBtn {
       margin-top: 4px;
       width: 100%;
       padding: 12px;
       border-radius: 999px;
       border: none;
-      font-family: "Orbitron";
+      font-family: "Orbitron", system-ui;
       font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       cursor: pointer;
       background: radial-gradient(circle at top, #ffeb3b 0, #ff9800 40%, #e91e63 100%);
       color: #2b0b24;
       box-shadow:
         0 6px 0 rgba(123, 31, 162, 1),
         0 0 20px rgba(255, 235, 59, 0.9);
+      transform: translateY(0);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.1s ease;
     }
 
-    #spinBtn:disabled { opacity: 0.55; cursor: not-allowed; }
+    #spinBtn:hover:not(:disabled) {
+      filter: brightness(1.05);
+    }
 
-    #mensaje { margin-top: 14px; min-height: 60px; font-size: 0.92rem; }
-    #mensaje.ok { color: #c6ff00; font-weight: 700; }
-    #mensaje.error { color: #ff8a80; font-weight: 600; }
+    #spinBtn:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow:
+        0 3px 0 rgba(123, 31, 162, 1),
+        0 0 14px rgba(255, 235, 59, 0.7);
+    }
 
-    .info-intentos { margin-top: 8px; font-size: 0.85rem; color: #b3e5fc; }
+    #spinBtn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: translateY(3px);
+      box-shadow:
+        0 3px 0 rgba(80, 80, 80, 0.5),
+        0 0 8px rgba(120, 120, 120, 0.4);
+    }
+
+    #mensaje {
+      margin-top: 14px;
+      min-height: 60px;
+      font-size: 0.92rem;
+    }
+
+    #mensaje.ok {
+      color: #c6ff00;
+      text-shadow: 0 0 10px rgba(198, 255, 0, 0.8);
+      font-weight: 700;
+    }
+
+    #mensaje.error {
+      color: #ff8a80;
+      font-weight: 600;
+    }
+
+    .info-intentos {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #b3e5fc;
+    }
 
     .nota {
       display: block;
       margin-top: 14px;
       font-size: 0.75rem;
       color: #b0bec5;
+      line-height: 1.4;
+    }
+
+    .paytable {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: #ffe082;
+      line-height: 1.4;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>RED-B JACKPOT</h1>
-    <p class="sub">Tocá el botón y <strong>probá tu suerte</strong> 🎰</p>
+    <p class="jackpot-label">Slot exclusivo promo RED-B</p>
+    <p class="sub">
+      Tocá el botón y <strong>probá tu suerte</strong> en el jackpot 🎰
+    </p>
 
     <div class="slot-wrapper" id="slotWrapper">
       <div class="slot-machine" id="slotMachine">
-        <!-- Rodillos (igual que antes) -->
+        <!-- 5 columnas × 3 filas -->
         <div class="reel-column">
-          <div class="cell" data-row="1" data-col="0">💎</div>
+          <div class="cell" data-row="0" data-col="0">💎</div>
+          <div class="cell" data-row="1" data-col="0">👑</div>
+          <div class="cell" data-row="2" data-col="0">🔔</div>
         </div>
         <div class="reel-column">
+          <div class="cell" data-row="0" data-col="1">💠</div>
           <div class="cell" data-row="1" data-col="1">🃏</div>
+          <div class="cell" data-row="2" data-col="1">⭐</div>
         </div>
         <div class="reel-column">
-          <div class="cell" data-row="1" data-col="2">⭐</div>
+          <div class="cell" data-row="0" data-col="2">👑</div>
+          <div class="cell" data-row="1" data-col="2">💠</div>
+          <div class="cell" data-row="2" data-col="2">💎</div>
         </div>
         <div class="reel-column">
-          <div class="cell" data-row="1" data-col="3">💎</div>
+          <div class="cell" data-row="0" data-col="3">🔔</div>
+          <div class="cell" data-row="1" data-col="3">⭐</div>
+          <div class="cell" data-row="2" data-col="3">🃏</div>
         </div>
         <div class="reel-column">
-          <div class="cell" data-row="1" data-col="4">🃏</div>
+          <div class="cell" data-row="0" data-col="4">💎</div>
+          <div class="cell" data-row="1" data-col="4">👑</div>
+          <div class="cell" data-row="2" data-col="4">💠</div>
         </div>
       </div>
     </div>
@@ -177,14 +277,310 @@
 
     <div id="mensaje"></div>
 
+    <div class="paytable">
+      🃏 3 JOKER en la línea central → <strong>500 fichas</strong><br>
+      ⭐ 3 BONUS en la línea central → <strong>300 fichas</strong><br>
+      💎 3 DIAMANTES en la línea central → <strong>200 fichas</strong><br>
+      Los premios son en fichas RED-B.
+    </div>
+
     <small class="nota">
-      Si tenés premio, sacá captura y enviála a la línea RED-B.  
+      Si tenés premio, sacá captura y enviála a la línea de RED-B junto con tu código.  
       Promoción RED-B JACKPOT.
     </small>
   </div>
 
   <script>
-    /* ✅ TODA LA LÓGICA SIGUE IGUAL */
+    // CONFIG PREMIOS POR DÍA
+    const MAX_PREMIOS_JOKER = 10;  // 🃏 500 fichas
+    const MAX_PREMIOS_BONUS = 10;  // ⭐ 300 fichas
+    const MAX_PREMIOS_DIAMANTE = 10; // 💎 200 fichas
+
+    const STORAGE_KEY = "redb_jackpot_state_v1";
+
+    // Símbolos (por ahora emojis; luego se pueden reemplazar por imágenes)
+    const SYMBOLS = ["🃏", "⭐", "💎", "👑", "🔔", "💠"];
+
+    // Mapeo de premios
+    const PRIZE_MAP = {
+      "🃏": { tipo: "J", fichas: 500, key: "usadosJoker", max: MAX_PREMIOS_JOKER },
+      "⭐": { tipo: "B", fichas: 300, key: "usadosBonus", max: MAX_PREMIOS_BONUS },
+      "💎": { tipo: "D", fichas: 200, key: "usadosDiamante", max: MAX_PREMIOS_DIAMANTE }
+    };
+
+    const slotMachine = document.getElementById("slotMachine");
+    const cells = Array.from(slotMachine.querySelectorAll(".cell"));
+    const spinBtn = document.getElementById("spinBtn");
+    const mensaje = document.getElementById("mensaje");
+    const slotWrapper = document.getElementById("slotWrapper");
+
+    function hoyString() {
+      const h = new Date();
+      return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,"0")}-${String(h.getDate()).padStart(2,"0")}`;
+    }
+
+    function cargarEstado() {
+      try {
+        const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        const hoy = hoyString();
+        if (!data || data.fecha !== hoy) {
+          return {
+            fecha: hoy,
+            usadosJoker: 0,
+            usadosBonus: 0,
+            usadosDiamante: 0,
+            yaJugoHoy: false
+          };
+        }
+        return {
+          fecha: data.fecha || hoy,
+          usadosJoker: data.usadosJoker || 0,
+          usadosBonus: data.usadosBonus || 0,
+          usadosDiamante: data.usadosDiamante || 0,
+          yaJugoHoy: !!data.yaJugoHoy
+        };
+      } catch {
+        const hoy = hoyString();
+        return {
+          fecha: hoy,
+          usadosJoker: 0,
+          usadosBonus: 0,
+          usadosDiamante: 0,
+          yaJugoHoy: false
+        };
+      }
+    }
+
+    function guardarEstado(estado) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
+    }
+
+    function mensajeInfo(texto, tipo = null) {
+      mensaje.innerHTML = texto;
+      mensaje.classList.remove("ok", "error");
+      if (tipo === "ok") mensaje.classList.add("ok");
+      if (tipo === "error") mensaje.classList.add("error");
+    }
+
+    function simboloRandom() {
+      return SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+    }
+
+    // Animar columnas secuenciales
+    function girarColumna(colIndex, duracion, callbackFin) {
+      const colCells = cells.filter(c => parseInt(c.dataset.col, 10) === colIndex);
+      const start = performance.now();
+
+      function frame(now) {
+        if (now - start < duracion) {
+          colCells.forEach(cell => {
+            cell.textContent = simboloRandom();
+          });
+          requestAnimationFrame(frame);
+        } else {
+          // Fijar símbolo final de esta columna (arriba, centro, abajo)
+          colCells.forEach(cell => {
+            cell.textContent = simboloRandom();
+          });
+          callbackFin && callbackFin();
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    // Gira las 5 columnas una tras otra
+    function animarRodillosSecuencial(callbackFin) {
+      const durBase = 550; // ms
+      let col = 0;
+
+      function next() {
+        if (col < 5) {
+          girarColumna(col, durBase + col * 120, () => {
+            col++;
+            next();
+          });
+        } else {
+          callbackFin && callbackFin();
+        }
+      }
+
+      next();
+    }
+
+    // Código anti-estafa
+    function generarCodigo(tipoPremio) {
+      const ahora = new Date();
+      const y = ahora.getFullYear();
+      const m = String(ahora.getMonth()+1).padStart(2,"0");
+      const d = String(ahora.getDate()).padStart(2,"0");
+      const hh = String(ahora.getHours()).padStart(2,"0");
+      const mm = String(ahora.getMinutes()).padStart(2,"0");
+      const ss = String(ahora.getSeconds()).padStart(2,"0");
+
+      const base = `${y}${m}${d}${hh}${mm}${ss}`;
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let rand = "";
+      for (let i = 0; i < 4; i++) {
+        rand += chars[Math.floor(Math.random() * chars.length)];
+      }
+
+      // REDB-JACK-<tipo>-<fecha-hora>-<random>
+      return `REDBJACK-${tipoPremio}-${base}-${rand}`;
+    }
+
+    function formatearFechaHora() {
+      const ahora = new Date();
+      const d = String(ahora.getDate()).padStart(2,"0");
+      const m = String(ahora.getMonth()+1).padStart(2,"0");
+      const y = ahora.getFullYear();
+      const hh = String(ahora.getHours()).padStart(2,"0");
+      const mm = String(ahora.getMinutes()).padStart(2,"0");
+      const ss = String(ahora.getSeconds()).padStart(2,"0");
+      return { fecha: `${d}/${m}/${y}`, hora: `${hh}:${mm}:${ss}` };
+    }
+
+    // Busca 3 consecutivos iguales en la línea central (fila 1) entre las 5 columnas
+    function evaluarLineaCentral() {
+      const lineaCentral = [];
+      for (let col = 0; col < 5; col++) {
+        const cell = cells.find(c => parseInt(c.dataset.col, 10) === col && parseInt(c.dataset.row, 10) === 1);
+        lineaCentral.push({ col, simbolo: cell.textContent, cell });
+      }
+
+      let mejorPremio = null;
+      let mejorRun = null;
+
+      let currentSymbol = lineaCentral[0].simbolo;
+      let runStart = 0;
+      let runLength = 1;
+
+      function cerrarRun(indexFinalNoIncluido) {
+        if (runLength >= 3 && PRIZE_MAP[currentSymbol]) {
+          const infoPremio = PRIZE_MAP[currentSymbol];
+          if (!mejorPremio || infoPremio.fichas > mejorPremio.fichas) {
+            mejorPremio = infoPremio;
+            mejorRun = {
+              simbolo: currentSymbol,
+              startCol: runStart,
+              endCol: indexFinalNoIncluido - 1
+            };
+          }
+        }
+      }
+
+      for (let i = 1; i < lineaCentral.length; i++) {
+        if (lineaCentral[i].simbolo === currentSymbol) {
+          runLength++;
+        } else {
+          cerrarRun(i);
+          currentSymbol = lineaCentral[i].simbolo;
+          runStart = i;
+          runLength = 1;
+        }
+      }
+      cerrarRun(lineaCentral.length);
+
+      if (mejorPremio && mejorRun) {
+        const celdasGanadoras = lineaCentral
+          .filter(item => item.col >= mejorRun.startCol && item.col <= mejorRun.endCol)
+          .map(item => item.cell);
+        return { premio: mejorPremio, celdas: celdasGanadoras };
+      }
+
+      return null;
+    }
+
+    function limpiarResaltados() {
+      cells.forEach(cell => {
+        cell.classList.remove("win-highlight", "joker-win", "bonus-win", "diamond-win");
+      });
+    }
+
+    function mostrarPremio(premioInfo, celdas) {
+      limpiarResaltados();
+
+      celdas.forEach(cell => {
+        cell.classList.add("win-highlight");
+      });
+
+      if (premioInfo.tipo === "J") {
+        celdas.forEach(c => c.classList.add("joker-win"));
+      } else if (premioInfo.tipo === "B") {
+        celdas.forEach(c => c.classList.add("bonus-win"));
+      } else if (premioInfo.tipo === "D") {
+        celdas.forEach(c => c.classList.add("diamond-win"));
+      }
+
+      slotWrapper.classList.add("shake");
+      setTimeout(() => slotWrapper.classList.remove("shake"), 600);
+
+      const { fecha, hora } = formatearFechaHora();
+      const codigo = generarCodigo(premioInfo.tipo);
+
+      mensajeInfo(`
+        🎉 ¡GANASTE <strong>${premioInfo.fichas} FICHAS</strong>! 🎉<br>
+        <small>
+        Premio en fichas RED-B JACKPOT.<br>
+        Fecha: ${fecha} - ${hora}<br>
+        Código: ${codigo}<br><br>
+        ✅ YA TE SALIÓ PREMIO<br>
+        📸 SACÁ CAPTURA Y ENVIÁLA A LA LÍNEA
+        </small>
+      `, "ok");
+
+      spinBtn.disabled = true;
+    }
+
+    function jugar() {
+      let estado = cargarEstado();
+
+      if (estado.yaJugoHoy) {
+        mensajeInfo("Ya jugaste hoy. Volvé mañana 🔁", "error");
+        spinBtn.disabled = true;
+        return;
+      }
+
+      spinBtn.disabled = true;
+      limpiarResaltados();
+      mensajeInfo("Girando rodillos... 🎰", null);
+
+      animarRodillosSecuencial(() => {
+        estado.yaJugoHoy = true;
+
+        const resultado = evaluarLineaCentral();
+
+        if (resultado) {
+          const { premio, celdas } = resultado;
+          const usadoActual = estado[premio.key] || 0;
+          if (usadoActual < premio.max) {
+            estado[premio.key] = usadoActual + 1;
+            guardarEstado(estado);
+            mostrarPremio(premio, celdas);
+          } else {
+            guardarEstado(estado);
+            mensajeInfo("Hoy ya se entregaron todos los premios de ese tipo. 🙈 Volvé mañana.", "error");
+          }
+        } else {
+          guardarEstado(estado);
+          mensajeInfo("Hoy no tocó premio 🙈 Volvé mañana.", "error");
+        }
+      });
+    }
+
+    // Estado inicial UI
+    (function init() {
+      const estado = cargarEstado();
+      if (estado.yaJugoHoy) {
+        spinBtn.disabled = true;
+        mensajeInfo("Ya jugaste hoy. Volvé mañana 🔁", "error");
+      } else {
+        spinBtn.disabled = false;
+        mensajeInfo("Tenés 1 intento hoy. ¡Suerte! 🍀", "ok");
+      }
+    })();
+
+    spinBtn.addEventListener("click", jugar);
   </script>
 </body>
 </html>
